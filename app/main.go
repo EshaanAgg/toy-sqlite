@@ -1,44 +1,43 @@
 package main
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
-	"log"
+	"github/com/codecrafters-io/sqlite-starter-go/app/cmd"
+	"github/com/codecrafters-io/sqlite-starter-go/app/defs"
+	"github/com/codecrafters-io/sqlite-starter-go/app/file"
 	"os"
+	"strings"
 )
 
-// Usage: your_sqlite3.sh sample.db .dbinfo
 func main() {
+	if len(os.Args) < 3 {
+		fmt.Println("Usage: go run main.go <database-file-path> <command>")
+		os.Exit(1)
+	}
+
 	databaseFilePath := os.Args[1]
 	command := os.Args[2]
 
-	switch command {
-	case ".dbinfo":
-		databaseFile, err := os.Open(databaseFilePath)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		header := make([]byte, 100)
-
-		_, err = databaseFile.Read(header)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		var pageSize uint16
-		if err := binary.Read(bytes.NewReader(header[16:18]), binary.BigEndian, &pageSize); err != nil {
-			fmt.Println("Failed to read integer:", err)
-			return
-		}
-		// You can use print statements as follows for debugging, they'll be visible when running tests.
-		fmt.Println("Logs from your program will appear here!")
-
-		// Uncomment this to pass the first stage
-		fmt.Printf("database page size: %v", pageSize)
-	default:
-		fmt.Println("Unknown command", command)
+	// Open the database file
+	dbFile, err := os.Open(databaseFilePath)
+	if err != nil {
+		fmt.Println("Failed to open database file: ", err)
 		os.Exit(1)
 	}
+
+	// Parse the database header
+	header, err := file.ParseDatabaseHeader(dbFile)
+	if err != nil {
+		fmt.Println("Failed to parse database header: ", err)
+		os.Exit(1)
+	}
+
+	// Create the command data and execute the command
+	commandData := defs.CommandData{
+		DatabaseFile: dbFile,
+		Command:      strings.Trim(command, " "),
+		Header:       header,
+	}
+
+	cmd.HandleCommand(&commandData)
 }
