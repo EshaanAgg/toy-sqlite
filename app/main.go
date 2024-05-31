@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	// Available if you need it!
-	// "github.com/xwb1989/sqlparser"
 )
 
 // Usage: your_sqlite3.sh sample.db .dbinfo
@@ -38,7 +36,7 @@ func main() {
 		fmt.Println("Logs from your program will appear here!")
 
 		// Uncomment this to pass the first stage
-		// fmt.Printf("database page size: %v", pageSize)
+		fmt.Printf("database page size: %v", pageSize)
 	default:
 		fmt.Println("Unknown command", command)
 		os.Exit(1)
