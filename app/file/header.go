@@ -28,15 +28,7 @@ type DatabaseHeader struct {
 }
 
 func ParseDatabaseHeader(databaseFile *os.File) (*DatabaseHeader, error) {
-	var data = make([]byte, 100)
-	_, err := databaseFile.ReadAt(data, 0)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read database file: %v", err)
-	}
-
-	if len(data) < 100 {
-		return nil, fmt.Errorf("invalid database file header: should be at least 100 bytes, is %d bytes", len(data))
-	}
+	data := utils.ReadFile(databaseFile, 0, 100)
 
 	if string(data[0:16]) != "SQLite format 3\000" {
 		return nil, fmt.Errorf("invalid database file header: not a SQLite database file")
