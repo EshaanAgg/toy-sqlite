@@ -10,6 +10,9 @@ func HandleDotCommand(commandData *defs.CommandData) {
 	case ".dbinfo":
 		DBInfo(commandData)
 
+	case ".tables":
+		Tables(commandData)
+
 	default:
 		fmt.Println("Unknown command: ", commandData.Command)
 	}

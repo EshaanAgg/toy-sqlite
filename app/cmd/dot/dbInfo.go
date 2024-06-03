@@ -3,6 +3,7 @@ package dot
 import (
 	"fmt"
 	"github/com/codecrafters-io/sqlite-starter-go/app/defs"
+	"github/com/codecrafters-io/sqlite-starter-go/app/file/tables"
 )
 
 func DBInfo(cmdData *defs.CommandData) {
@@ -28,4 +29,13 @@ func DBInfo(cmdData *defs.CommandData) {
 	fmt.Printf("text encoding: %d (%s)\n", h.TextEncoding, text_encoding_map[h.TextEncoding])
 	fmt.Println("user version:", h.UserVersion)
 	fmt.Println("application id:", h.ApplicationID)
+
+	schemaTable := tables.GetSQLiteSchema(cmdData.DatabaseFile)
+	numberTables := 0
+	for _, schemaItem := range schemaTable {
+		if schemaItem.Type == "table" {
+			numberTables++
+		}
+	}
+	fmt.Println("number of tables:", numberTables)
 }
