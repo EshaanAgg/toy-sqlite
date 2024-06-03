@@ -8,14 +8,7 @@ import (
 )
 
 func Tables(commandData *defs.CommandData) {
-	tableNames := make([]string, 0)
-
-	schemaTable := tables.GetSQLiteSchema(commandData.DatabaseFile)
-	for _, schemaItem := range schemaTable {
-		if schemaItem.Type == "table" && !strings.HasPrefix(schemaItem.Name, "sqlite_") {
-			tableNames = append(tableNames, schemaItem.Name)
-		}
-	}
+	tableNames := tables.GetSQLiteSchema(commandData.DatabaseFile).GetTableNames()
 
 	fmt.Println(strings.Join(tableNames, "\t"))
 }

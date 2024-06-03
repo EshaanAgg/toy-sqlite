@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github/com/codecrafters-io/sqlite-starter-go/app/file"
 	"os"
+	"strings"
 )
 
 type SchemaItem struct {
@@ -14,7 +15,11 @@ type SchemaItem struct {
 	SQL       string
 }
 
-func GetSQLiteSchema(dbFile *os.File) []SchemaItem {
+type SQLiteSchema struct {
+	Tables []SchemaItem
+}
+
+func GetSQLiteSchema(dbFile *os.File) SQLiteSchema {
 	rootPage, err := file.ParsePage(dbFile, 0, true)
 	if err != nil {
 		fmt.Println("Failed to parse root page: ", err)
@@ -41,5 +46,30 @@ func GetSQLiteSchema(dbFile *os.File) []SchemaItem {
 		}
 	}
 
-	return schemaItems
+	return SQLiteSchema{Tables: schemaItems}
+}
+
+// Returns the names of all user-defined tables in the schema.
+func (schema SQLiteSchema) GetTableNames() []string {
+	tableNames := make([]string, 0)
+	for _, schemaItem := range schema.Tables {
+		if schemaItem.Type == "table" && !strings.HasPrefix(schemaItem.Name, "sqlite_") {
+			tableNames = append(tableNames, schemaItem.Name)
+		}
+	}
+
+	return tableNames
+}
+
+// Returns the number of tables in the schema.
+// Includes both user-defined tables and system tables.
+func (schema SQLiteSchema) GetTableCount() uint {
+	tableCount := uint(0)
+	for _, schemaItem := range schema.Tables {
+		if schemaItem.Type == "table" {
+			tableCount++
+		}
+	}
+
+	return tableCount
 }

@@ -29,13 +29,6 @@ func DBInfo(cmdData *defs.CommandData) {
 	fmt.Printf("text encoding: %d (%s)\n", h.TextEncoding, text_encoding_map[h.TextEncoding])
 	fmt.Println("user version:", h.UserVersion)
 	fmt.Println("application id:", h.ApplicationID)
+	fmt.Println("number of tables:", tables.GetSQLiteSchema(cmdData.DatabaseFile).GetTableCount())
 
-	schemaTable := tables.GetSQLiteSchema(cmdData.DatabaseFile)
-	numberTables := 0
-	for _, schemaItem := range schemaTable {
-		if schemaItem.Type == "table" {
-			numberTables++
-		}
-	}
-	fmt.Println("number of tables:", numberTables)
 }
