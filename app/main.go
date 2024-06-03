@@ -32,6 +32,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	rootPage, err := file.ParsePage(dbFile, 0, true)
+	if err != nil {
+		fmt.Println("Failed to parse root page: ", err)
+		os.Exit(1)
+	}
+	for _, cell := range rootPage.LTCells {
+		fmt.Println(cell.Debug())
+	}
+
 	// Create the command data and execute the command
 	commandData := defs.CommandData{
 		DatabaseFile: dbFile,

@@ -49,8 +49,8 @@ func TestVarInt(t *testing.T) {
 
 		t.Logf("Testing Byte Array based Implementation [Test %d with value %d]", ind, test.value)
 
-		res, remBytes := encoding.ReadVarIntFromBytes(test.bytes)
+		res, index := encoding.ReadVarIntFromBytes(test.bytes)
 		assert.Equal(t, test.value, res)
-		assert.Equal(t, 0, len(remBytes))
+		assert.Equal(t, index, uint(len(test.bytes)))
 	}
 }

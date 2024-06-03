@@ -25,7 +25,7 @@ func ReadVarInt(file *os.File, startIndex uint) (uint, uint) {
 	return value, startIndex
 }
 
-func ReadVarIntFromBytes(bytes []byte) (uint, []byte) {
+func ReadVarIntFromBytes(bytes []byte) (uint, uint) {
 	startIndex := uint(0)
 	byte := bytes[startIndex]
 
@@ -41,5 +41,5 @@ func ReadVarIntFromBytes(bytes []byte) (uint, []byte) {
 		startIndex++
 	}
 
-	return value, bytes[startIndex:]
+	return value, startIndex
 }
