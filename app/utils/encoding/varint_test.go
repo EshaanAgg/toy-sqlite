@@ -5,8 +5,6 @@ import (
 	"os"
 	"strconv"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestVarInt(t *testing.T) {
@@ -34,23 +32,37 @@ func TestVarInt(t *testing.T) {
 
 		// Create a file with the test bytes
 		file, err := os.Create(test_dir + "/varint_test_" + strconv.Itoa(ind))
-		assert.NoError(t, err)
+		if err != nil {
+			t.Errorf("Failed to create file: %s", err)
+		}
 		_, err = file.Write(test.bytes)
-		assert.NoError(t, err)
+		if err != nil {
+			t.Errorf("Failed to write to file: %s", err)
+		}
 
 		// Read the file and parse the varint
 		value, nextIndex := encoding.ReadVarInt(file, 0)
-		assert.Equal(t, test.value, value)
-		assert.Equal(t, uint(len(test.bytes)), nextIndex)
+		if value != test.value {
+			t.Errorf("Expected %d, but got %d", test.value, value)
+		}
+		if int(nextIndex) != len(test.bytes) {
+			t.Errorf("Expected next index to be %d, but got %d", len(test.bytes), nextIndex)
+		}
 
 		// Close the file
 		err = file.Close()
-		assert.NoError(t, err)
+		if err != nil {
+			t.Errorf("Failed to close file: %s", err)
+		}
 
 		t.Logf("Testing Byte Array based Implementation [Test %d with value %d]", ind, test.value)
 
 		res, index := encoding.ReadVarIntFromBytes(test.bytes)
-		assert.Equal(t, test.value, res)
-		assert.Equal(t, index, uint(len(test.bytes)))
+		if res != test.value {
+			t.Errorf("Expected %d, but got %d", test.value, res)
+		}
+		if int(index) != len(test.bytes) {
+			t.Errorf("Expected next index to be %d, but got %d", len(test.bytes), index)
+		}
 	}
 }
