@@ -52,7 +52,7 @@ func ParseFields(l *sql.Lexer) ([]Field, error) {
 				},
 			)
 		} else {
-			columns, err := parseColumns(l)
+			columns, err := parseColumnNames(l)
 			if err != nil {
 				return nil, fmt.Errorf("failed to parse columns: %v", err)
 			}
@@ -73,7 +73,7 @@ func ParseFields(l *sql.Lexer) ([]Field, error) {
 	}
 
 	// column1, column2, ...
-	columns, err := parseColumns(l)
+	columns, err := parseColumnNames(l)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse columns: %v", err)
 	}
@@ -88,7 +88,7 @@ func ParseFields(l *sql.Lexer) ([]Field, error) {
 }
 
 // Parses comma sperated columns names
-func parseColumns(l *sql.Lexer) ([]string, error) {
+func parseColumnNames(l *sql.Lexer) ([]string, error) {
 	columns := make([]string, 0)
 
 	tok, err := l.PeekToken()

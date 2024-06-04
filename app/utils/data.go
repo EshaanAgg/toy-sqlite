@@ -11,3 +11,7 @@ func IsAlpha(c byte) bool {
 func IsAlphaNumeric(c byte) bool {
 	return IsAlpha(c) || IsDigit(c)
 }
+
+func IsAllowedIdentifierChar(c byte) bool {
+	return IsAlphaNumeric(c) || c == '_'
+}

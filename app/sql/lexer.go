@@ -16,6 +16,13 @@ const (
 	COUNT
 	FROM
 	WHERE
+	CREATE
+	TABLE
+	INTEGER
+	PRIMARY
+	KEY
+	AUTOINCREMENT
+	TEXT
 
 	// Operators
 	EQ
@@ -41,12 +48,19 @@ const (
 )
 
 var reservedKeywords = map[string]TokenType{
-	"SELECT": SELECT,
-	"FROM":   FROM,
-	"WHERE":  WHERE,
-	"COUNT":  COUNT,
-	"AND":    AND,
-	"OR":     OR,
+	"SELECT":        SELECT,
+	"FROM":          FROM,
+	"WHERE":         WHERE,
+	"COUNT":         COUNT,
+	"AND":           AND,
+	"OR":            OR,
+	"CREATE":        CREATE,
+	"TABLE":         TABLE,
+	"INTEGER":       INTEGER,
+	"PRIMARY":       PRIMARY,
+	"KEY":           KEY,
+	"AUTOINCREMENT": AUTOINCREMENT,
+	"TEXT":          TEXT,
 }
 
 type Token struct {
@@ -67,6 +81,10 @@ func NewLexer(input string) *Lexer {
 		length: len(input),
 		curPos: 0,
 	}
+}
+
+func (l *Lexer) CurPos() int {
+	return l.curPos
 }
 
 // Returns the next byte in the input string without advancing the lexer's position.
@@ -106,8 +124,8 @@ func (l *Lexer) PeekToken() (Token, error) {
 func (l *Lexer) NextToken() (Token, error) {
 	tok := Token{}
 
-	// Skip whitespace in the input
-	for l.Peek() == ' ' {
+	// Skip whitespace and new lines in the input
+	for l.Peek() == ' ' || l.Peek() == '\n' || l.Peek() == '\t' {
 		l.Next()
 	}
 
@@ -177,7 +195,7 @@ func (l *Lexer) NextToken() (Token, error) {
 	default:
 		if utils.IsDigit(chr) {
 			return l.parseIntOrFloat()
-		} else if utils.IsAlpha(chr) || chr == '"' {
+		} else if utils.IsAlpha(chr) || chr == '\'' {
 			return l.parseString()
 		} else {
 			return tok, fmt.Errorf("unexpected token: %c", chr)
@@ -192,10 +210,10 @@ func (l *Lexer) NextToken() (Token, error) {
 func (l *Lexer) parseString() (Token, error) {
 	tok := Token{Type: STRING, Value: ""}
 
-	if l.Peek() == '"' {
+	if l.Peek() == '\'' {
 		l.Next() // Skip the opening quote
 
-		for l.Peek() != '"' {
+		for l.Peek() != '\'' {
 			if l.Peek() == 0 {
 				return tok, fmt.Errorf("unexpected EOF while parsing string")
 			}
@@ -205,8 +223,8 @@ func (l *Lexer) parseString() (Token, error) {
 		l.Next() // Skip the closing quote
 	} else {
 		tok.Type = OBJ
-		// Read till we get alphanumeric characters
-		for utils.IsAlphaNumeric(l.Peek()) {
+		// Read till we get a non-identifier character
+		for utils.IsAllowedIdentifierChar(l.Peek()) {
 			tok.Value += string(l.Next())
 		}
 

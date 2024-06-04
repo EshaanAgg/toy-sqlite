@@ -37,24 +37,24 @@ func TestLexer(t *testing.T) {
 	testCases := []testCaseLexer{
 		{
 			desc:  "Simple SELECT statement",
-			input: "SELECT * FROM table",
+			input: "SELECT * FROM table_name",
 			want: []sql.Token{
 				{Type: sql.SELECT, Value: "SELECT"},
 				{Type: sql.ASTERISK, Value: "*"},
 				{Type: sql.FROM, Value: "FROM"},
-				{Type: sql.OBJ, Value: "table"},
+				{Type: sql.OBJ, Value: "table_name"},
 				{Type: sql.EOF, Value: ""},
 			},
 		},
 
 		{
 			desc:  "SELECT statement with WHERE clause",
-			input: "SELECT * FROM table WHERE column = 10",
+			input: "SELECT * FROM table_name WHERE column = 10",
 			want: []sql.Token{
 				{Type: sql.SELECT, Value: "SELECT"},
 				{Type: sql.ASTERISK, Value: "*"},
 				{Type: sql.FROM, Value: "FROM"},
-				{Type: sql.OBJ, Value: "table"},
+				{Type: sql.OBJ, Value: "table_name"},
 				{Type: sql.WHERE, Value: "WHERE"},
 				{Type: sql.OBJ, Value: "column"},
 				{Type: sql.EQ, Value: "="},
@@ -65,12 +65,12 @@ func TestLexer(t *testing.T) {
 
 		{
 			desc:  "SELECT statement with WHERE clause and LOGICAL operators",
-			input: "SELECT * FROM table WHERE column = 10 AND column2 = 20 OR column3 = 30",
+			input: "SELECT * FROM table_name WHERE column = 10 AND column2 = 20 OR column3 = 30",
 			want: []sql.Token{
 				{Type: sql.SELECT, Value: "SELECT"},
 				{Type: sql.ASTERISK, Value: "*"},
 				{Type: sql.FROM, Value: "FROM"},
-				{Type: sql.OBJ, Value: "table"},
+				{Type: sql.OBJ, Value: "table_name"},
 				{Type: sql.WHERE, Value: "WHERE"},
 				{Type: sql.OBJ, Value: "column"},
 				{Type: sql.EQ, Value: "="},
@@ -89,12 +89,12 @@ func TestLexer(t *testing.T) {
 
 		{
 			desc:  "SELECT statement with WHERE clause, all ARITHMETIC operators, PARENTHESIS and FLOATS",
-			input: "SELECT * FROM table WHERE (column = 10 AND column2 != 20) OR (column3 > 30.0 AND column4 >= 40.124) OR (column5 < 50.10 AND column6 <= 60)",
+			input: "SELECT * FROM table_name WHERE (column = 10 AND column2 != 20) OR (column3 > 30.0 AND column4 >= 40.124) OR (column5 < 50.10 AND column6 <= 60)",
 			want: []sql.Token{
 				{Type: sql.SELECT, Value: "SELECT"},
 				{Type: sql.ASTERISK, Value: "*"},
 				{Type: sql.FROM, Value: "FROM"},
-				{Type: sql.OBJ, Value: "table"},
+				{Type: sql.OBJ, Value: "table_name"},
 				{Type: sql.WHERE, Value: "WHERE"},
 				{Type: sql.OPEN_PAREN, Value: "("},
 				{Type: sql.OBJ, Value: "column"},
@@ -131,12 +131,12 @@ func TestLexer(t *testing.T) {
 
 		{
 			desc:  "SELECT statement with WHERE clause with STRING values",
-			input: `SELECT * FROM table WHERE column = "value"`,
+			input: "SELECT * FROM table_name WHERE column = 'value'",
 			want: []sql.Token{
 				{Type: sql.SELECT, Value: "SELECT"},
 				{Type: sql.ASTERISK, Value: "*"},
 				{Type: sql.FROM, Value: "FROM"},
-				{Type: sql.OBJ, Value: "table"},
+				{Type: sql.OBJ, Value: "table_name"},
 				{Type: sql.WHERE, Value: "WHERE"},
 				{Type: sql.OBJ, Value: "column"},
 				{Type: sql.EQ, Value: "="},
@@ -147,7 +147,7 @@ func TestLexer(t *testing.T) {
 
 		{
 			desc:  "COUNT statement",
-			input: "SELECT COUNT(*) FROM table",
+			input: "SELECT COUNT(*) FROM table_name",
 			want: []sql.Token{
 				{Type: sql.SELECT, Value: "SELECT"},
 				{Type: sql.COUNT, Value: "COUNT"},
@@ -155,14 +155,14 @@ func TestLexer(t *testing.T) {
 				{Type: sql.ASTERISK, Value: "*"},
 				{Type: sql.CLOSE_PAREN, Value: ")"},
 				{Type: sql.FROM, Value: "FROM"},
-				{Type: sql.OBJ, Value: "table"},
+				{Type: sql.OBJ, Value: "table_name"},
 				{Type: sql.EOF, Value: ""},
 			},
 		},
 
 		{
 			desc:  "COUNT statement with WHERE clause",
-			input: "SELECT COUNT(column1, column2) FROM table WHERE column = 10",
+			input: "SELECT COUNT(column1, column2) FROM table_name WHERE column = 10",
 			want: []sql.Token{
 				{Type: sql.SELECT, Value: "SELECT"},
 				{Type: sql.COUNT, Value: "COUNT"},
@@ -172,11 +172,47 @@ func TestLexer(t *testing.T) {
 				{Type: sql.OBJ, Value: "column2"},
 				{Type: sql.CLOSE_PAREN, Value: ")"},
 				{Type: sql.FROM, Value: "FROM"},
-				{Type: sql.OBJ, Value: "table"},
+				{Type: sql.OBJ, Value: "table_name"},
 				{Type: sql.WHERE, Value: "WHERE"},
 				{Type: sql.OBJ, Value: "column"},
 				{Type: sql.EQ, Value: "="},
 				{Type: sql.INT, Value: "10"},
+				{Type: sql.EOF, Value: ""},
+			},
+		},
+
+		{
+			desc:  "CREATE TABLE statement with MULTIPLE column and PRIMARY KEY",
+			input: "CREATE TABLE table_name (column1 INTEGER PRIMARY KEY AUTOINCREMENT, column2 TEXT)",
+			want: []sql.Token{
+				{Type: sql.CREATE, Value: "CREATE"},
+				{Type: sql.TABLE, Value: "TABLE"},
+				{Type: sql.OBJ, Value: "table_name"},
+				{Type: sql.OPEN_PAREN, Value: "("},
+				{Type: sql.OBJ, Value: "column1"},
+				{Type: sql.INTEGER, Value: "INTEGER"},
+				{Type: sql.PRIMARY, Value: "PRIMARY"},
+				{Type: sql.KEY, Value: "KEY"},
+				{Type: sql.AUTOINCREMENT, Value: "AUTOINCREMENT"},
+				{Type: sql.COMMA, Value: ","},
+				{Type: sql.OBJ, Value: "column2"},
+				{Type: sql.TEXT, Value: "TEXT"},
+				{Type: sql.CLOSE_PAREN, Value: ")"},
+				{Type: sql.EOF, Value: ""},
+			},
+		},
+
+		{
+			desc:  "CREATE TABLE statement with SINGLE column and NO PRIMARY KEY",
+			input: "CREATE TABLE table_name (column1 INTEGER)",
+			want: []sql.Token{
+				{Type: sql.CREATE, Value: "CREATE"},
+				{Type: sql.TABLE, Value: "TABLE"},
+				{Type: sql.OBJ, Value: "table_name"},
+				{Type: sql.OPEN_PAREN, Value: "("},
+				{Type: sql.OBJ, Value: "column1"},
+				{Type: sql.INTEGER, Value: "INTEGER"},
+				{Type: sql.CLOSE_PAREN, Value: ")"},
 				{Type: sql.EOF, Value: ""},
 			},
 		},
