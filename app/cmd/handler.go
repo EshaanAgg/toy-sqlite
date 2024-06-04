@@ -18,14 +18,12 @@ func HandleCommand(commandData *defs.CommandData) {
 
 	cmdLexer := sql.NewLexer(commandData.Command)
 	selectStmt, err := stmt.ParseSelectStatement(cmdLexer)
-
 	if err != nil {
 		fmt.Println("Error parsing command: ", err)
-		fmt.Println("Command: ", commandData.Command)
+		fmt.Println(commandData.Command)
 		fmt.Printf("%s^\n", strings.Repeat(" ", cmdLexer.CurPos()))
 		return
 	}
-	sel.HandleSelectCommand(commandData, selectStmt)
 
-	fmt.Println("Unknown command: ", commandData.Command)
+	sel.HandleSelectCommand(commandData, selectStmt)
 }

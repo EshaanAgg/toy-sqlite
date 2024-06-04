@@ -46,7 +46,7 @@ func ParseFields(l *sql.Lexer) ([]Field, error) {
 			l.NextToken()
 			fields = append(fields,
 				Field{
-					Name:     "COUNT",
+					Name:     "ALL",
 					Type:     "COUNT",
 					Metadata: "*",
 				},
@@ -58,7 +58,7 @@ func ParseFields(l *sql.Lexer) ([]Field, error) {
 			}
 			fields = append(fields,
 				Field{
-					Name:     "COUNT",
+					Name:     "COLS",
 					Type:     "COUNT",
 					Metadata: strings.Join(columns, ","),
 				})

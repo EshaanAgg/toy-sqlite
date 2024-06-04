@@ -46,7 +46,7 @@ func TestField(t *testing.T) {
 			name:  "COUNT for records",
 			query: "COUNT(*)",
 			want: []stmt.Field{
-				{Name: "COUNT", Type: "COUNT", Metadata: "*"},
+				{Name: "ALL", Type: "COUNT", Metadata: "*"},
 			},
 		},
 
@@ -54,7 +54,7 @@ func TestField(t *testing.T) {
 			name:  "COUNT for columns",
 			query: "COUNT(column1, column2)",
 			want: []stmt.Field{
-				{Name: "COUNT", Type: "COUNT", Metadata: "column1,column2"},
+				{Name: "COLS", Type: "COUNT", Metadata: "column1,column2"},
 			},
 		},
 
@@ -62,7 +62,7 @@ func TestField(t *testing.T) {
 			name:  "COUNT for one column",
 			query: "COUNT(column1)",
 			want: []stmt.Field{
-				{Name: "COUNT", Type: "COUNT", Metadata: "column1"},
+				{Name: "COLS", Type: "COUNT", Metadata: "column1"},
 			},
 		},
 	}
