@@ -16,6 +16,10 @@ The current implementation supports:
 -- COUNT queries
 SELECT COUNT(*) FROM table_name;
 SELECT COUNT(a, b, c) FROM table_name;
+
+-- SELECT queries
+SELECT * FROM table_name;
+SELECT a, b, c FROM table_name;
 ```
 
 # Sample Database

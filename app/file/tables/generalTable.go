@@ -6,6 +6,7 @@ import (
 	"github/com/codecrafters-io/sqlite-starter-go/app/sql/stmt"
 	"github/com/codecrafters-io/sqlite-starter-go/app/utils/encoding"
 	"os"
+	"strings"
 )
 
 type Record struct {
@@ -74,4 +75,47 @@ func NewTableFromRootPage(rootPage uint, dbFile *os.File, pageSize uint, tableNa
 		Records:  rows,
 		ColToIdx: colToIdx,
 	}, nil
+}
+
+func (t *Table) GetAllColumnNames() []string {
+	names := make([]string, len(t.Columns))
+	for i, col := range t.Columns {
+		names[i] = col.Name
+	}
+	return names
+}
+
+func (t *Table) Debug() string {
+	debug := fmt.Sprintf("Name: %s\n", t.Name)
+
+	allCols := make([]string, 0)
+	for _, col := range t.Columns {
+		allCols = append(allCols, col.Debug())
+	}
+	debug += fmt.Sprintf("Columns: %s\n", strings.Join(allCols, " | "))
+
+	debug += fmt.Sprintf("Data: %s\n", DebugRecordData(t.Records))
+	debug += fmt.Sprintf("IdxMap: %v\n", t.ColToIdx)
+
+	return debug
+}
+
+func (r *Record) Debug() string {
+	if r.Null {
+		return "null"
+	}
+
+	if r.StrVal != "" {
+		return r.StrVal
+	}
+
+	if r.IntVal != 0 {
+		return fmt.Sprintf("%d", r.IntVal)
+	}
+
+	if r.DoubleVal != 0.0 {
+		return fmt.Sprintf("%f", r.DoubleVal)
+	}
+
+	return ""
 }

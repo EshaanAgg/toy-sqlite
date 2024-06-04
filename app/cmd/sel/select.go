@@ -12,15 +12,15 @@ import (
 func HandleSelectCommand(cmdData *defs.CommandData, selectStmt *stmt.SelectStatement) {
 	tableData, err := getTableData(cmdData, selectStmt)
 	if err != nil {
-		fmt.Println("ERR: ", err)
+		fmt.Printf("ERR: %v", err)
 		return
 	}
 
-	// Handle the COUNT clause
+	// Handle the COUNT case
 	if len(selectStmt.Fields) == 1 && selectStmt.Fields[0].Type == "COUNT" {
 		count, err := getCount(tableData, selectStmt.Fields)
 		if err != nil {
-			fmt.Println("ERR: ", err)
+			fmt.Printf("ERR: %v", err)
 			return
 		}
 
@@ -28,7 +28,31 @@ func HandleSelectCommand(cmdData *defs.CommandData, selectStmt *stmt.SelectState
 		return
 	}
 
-	fmt.Println("Not implemented")
+	// Handle the SELECT columns statement
+	if len(selectStmt.Fields) == 0 {
+		fmt.Println("ERR: There were no fields/columns provided to show from the table.")
+		return
+	}
+
+	colNames := make([]string, 0)
+	if selectStmt.Fields[0].Type == "ALL" {
+		colNames = tableData.GetAllColumnNames()
+	} else {
+		for _, field := range selectStmt.Fields {
+			if field.Type != "COLUMN" {
+				fmt.Printf("Expected a field of COLUMN type, but got %s", field.Type)
+			}
+			colNames = append(colNames, field.Name)
+		}
+	}
+
+	idxToKeep, err := getAllColIndices(tableData, colNames)
+	if err != nil {
+		fmt.Printf("ERR: %v\n", err)
+	}
+
+	displayData, displayColDefs := performSelect(tableData.Records, tableData.Columns, idxToKeep)
+	DisplayRecords(displayData, displayColDefs)
 }
 
 // Returns all the data associated with the table in the database file
@@ -98,4 +122,16 @@ func getCount(tableData *tables.Table, fields []stmt.Field) (uint, error) {
 	}
 
 	return 0, fmt.Errorf("invalid field type in COUNT statement: %s", field.Type)
+}
+
+// Performs the selection operation and returns the new data rows and the column headers.
+func performSelect(data [][]tables.Record, colDefs []stmt.Column, idxToKeep []int) ([][]tables.Record, []stmt.Column) {
+	newColDefs := getIndices(colDefs, idxToKeep)
+
+	newData := make([][]tables.Record, len(data))
+	for rowIndex, row := range data {
+		newData[rowIndex] = getIndices(row, idxToKeep)
+	}
+
+	return newData, newColDefs
 }

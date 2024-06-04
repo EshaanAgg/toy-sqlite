@@ -140,3 +140,14 @@ func parseColumns(l *sql.Lexer) ([]Column, error) {
 
 	return columns, nil
 }
+
+func (c *Column) Debug() string {
+	debug := fmt.Sprintf("%s %s", c.Name, c.Type)
+	if c.PrimaryKey {
+		debug += " PRIMARY KEY"
+	}
+	if c.AutoIncrement {
+		debug += " AUTOINCREMENT"
+	}
+	return debug
+}
