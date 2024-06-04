@@ -3,6 +3,8 @@ package utils_test
 import (
 	"github/com/codecrafters-io/sqlite-starter-go/app/utils"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestReadTwosComplement(t *testing.T) {
@@ -32,8 +34,6 @@ func TestReadTwosComplement(t *testing.T) {
 
 	for _, tc := range testCases {
 		val := utils.ReadTwosComplement(tc.bytes)
-		if val != tc.expected {
-			t.Errorf("Expected %d, but got %d", tc.expected, val)
-		}
+		assert.Equal(t, tc.expected, val)
 	}
 }
