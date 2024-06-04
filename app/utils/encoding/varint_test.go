@@ -1,6 +1,7 @@
 package encoding_test
 
 import (
+	"fmt"
 	"github/com/codecrafters-io/sqlite-starter-go/app/utils/encoding"
 	"os"
 	"strconv"
@@ -30,27 +31,28 @@ func TestVarInt(t *testing.T) {
 	test_dir := os.TempDir()
 
 	for ind, test := range tests {
-		t.Logf("Testing OS File based Implementation [Test %d with value %d]", ind, test.value)
+		t.Run(fmt.Sprintf("OS Based %d", ind+1), func(t *testing.T) {
+			// Create a file with the test bytes
+			file, err := os.Create(test_dir + "/varint_test_" + strconv.Itoa(ind))
+			assert.NoError(t, err)
+			_, err = file.Write(test.bytes)
+			assert.NoError(t, err)
 
-		// Create a file with the test bytes
-		file, err := os.Create(test_dir + "/varint_test_" + strconv.Itoa(ind))
-		assert.NoError(t, err)
-		_, err = file.Write(test.bytes)
-		assert.NoError(t, err)
+			// Read the file and parse the varint
+			value, nextIndex := encoding.ReadVarInt(file, 0)
+			assert.Equal(t, test.value, value)
+			assert.Equal(t, len(test.bytes), int(nextIndex))
 
-		// Read the file and parse the varint
-		value, nextIndex := encoding.ReadVarInt(file, 0)
-		assert.Equal(t, test.value, value)
-		assert.Equal(t, len(test.bytes), nextIndex)
+			// Close the file
+			err = file.Close()
+			assert.NoError(t, err)
+		})
 
-		// Close the file
-		err = file.Close()
-		assert.NoError(t, err)
+		t.Run(fmt.Sprintf("Bytes Based %d", ind+1), func(t *testing.T) {
+			res, index := encoding.ReadVarIntFromBytes(test.bytes)
+			assert.Equal(t, test.value, res)
+			assert.Equal(t, len(test.bytes), int(index))
+		})
 
-		t.Logf("Testing Byte Array based Implementation [Test %d with value %d]", ind, test.value)
-
-		res, index := encoding.ReadVarIntFromBytes(test.bytes)
-		assert.Equal(t, test.value, res)
-		assert.Equal(t, len(test.bytes), index)
 	}
 }

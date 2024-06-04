@@ -13,6 +13,7 @@ const (
 
 	// Keywords
 	SELECT
+	COUNT
 	FROM
 	WHERE
 
@@ -36,12 +37,14 @@ const (
 	STRING
 	INT
 	FLOAT
+	OBJ // Column or table name
 )
 
 var reservedKeywords = map[string]TokenType{
 	"SELECT": SELECT,
 	"FROM":   FROM,
 	"WHERE":  WHERE,
+	"COUNT":  COUNT,
 	"AND":    AND,
 	"OR":     OR,
 }
@@ -52,9 +55,10 @@ type Token struct {
 }
 
 type Lexer struct {
-	input  string
-	curPos int
-	length int
+	input        string
+	curPos       int
+	length       int
+	peekedOffset int // Used to keep track of the number of token for peek operation
 }
 
 func NewLexer(input string) *Lexer {
@@ -82,8 +86,19 @@ func (l *Lexer) Next() byte {
 
 	b := l.input[l.curPos]
 	l.curPos++
+	l.peekedOffset++
 
 	return b
+}
+
+// Returns the next token in the input string without advancing the lexer's position.
+func (l *Lexer) PeekToken() (Token, error) {
+	l.peekedOffset = 0
+
+	tok, err := l.NextToken()
+	l.curPos -= l.peekedOffset
+
+	return tok, err
 }
 
 // Returns the next token in the input string and advances the lexer's position.
@@ -189,6 +204,7 @@ func (l *Lexer) parseString() (Token, error) {
 
 		l.Next() // Skip the closing quote
 	} else {
+		tok.Type = OBJ
 		// Read till we get alphanumeric characters
 		for utils.IsAlphaNumeric(l.Peek()) {
 			tok.Value += string(l.Next())
@@ -229,4 +245,17 @@ func (l *Lexer) parseIntOrFloat() (Token, error) {
 	}
 
 	return tok, nil
+}
+
+func (l *Lexer) ExpectToken(expected TokenType, stage string) error {
+	tok, err := l.NextToken()
+	if err != nil {
+		return fmt.Errorf("failed to get next token: %v [%s]", err, stage)
+	}
+
+	if tok.Type != expected {
+		return fmt.Errorf("expected token %d but got %d [%s]", expected, tok.Type, stage)
+	}
+
+	return nil
 }
