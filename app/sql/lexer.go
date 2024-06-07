@@ -24,15 +24,27 @@ const (
 	AUTOINCREMENT
 	TEXT
 
-	// Operators
+	// Comparision Operators
 	EQ
 	NEQ
 	GT
 	GTE
 	LT
 	LTE
+
+	// Logical Operators
 	AND
+	NOT
 	OR
+
+	// Arithmetic Operators
+	ADD
+	SUB
+	DIV
+	MOD
+	// No MUL as it is represented by ASTERISK
+
+	FUNC
 
 	// Reserved symbols
 	ASTERISK
@@ -52,8 +64,6 @@ var reservedKeywords = map[string]TokenType{
 	"FROM":          FROM,
 	"WHERE":         WHERE,
 	"COUNT":         COUNT,
-	"AND":           AND,
-	"OR":            OR,
 	"CREATE":        CREATE,
 	"TABLE":         TABLE,
 	"INTEGER":       INTEGER,
@@ -61,6 +71,16 @@ var reservedKeywords = map[string]TokenType{
 	"KEY":           KEY,
 	"AUTOINCREMENT": AUTOINCREMENT,
 	"TEXT":          TEXT,
+
+	"AND": AND,
+	"OR":  OR,
+	"NOT": NOT,
+}
+
+var functionNames = map[string]TokenType{
+	"UPPER":  FUNC,
+	"LOWER":  FUNC,
+	"CONCAT": FUNC,
 }
 
 type Token struct {
@@ -172,6 +192,26 @@ func (l *Lexer) NextToken() (Token, error) {
 			return tok, fmt.Errorf("unexpected token: %c after ! operator", l.Peek())
 		}
 
+	case '+':
+		l.Next()
+		tok.Type = ADD
+		tok.Value = "+"
+
+	case '-':
+		l.Next()
+		tok.Type = SUB
+		tok.Value = "-"
+
+	case '/':
+		l.Next()
+		tok.Type = DIV
+		tok.Value = "/"
+
+	case '%':
+		l.Next()
+		tok.Type = MOD
+		tok.Value = "%"
+
 	case '*':
 		l.Next()
 		tok.Type = ASTERISK
@@ -228,9 +268,15 @@ func (l *Lexer) parseString() (Token, error) {
 			tok.Value += string(l.Next())
 		}
 
-		// The string must be a reserved keyword
+		// The string might be a reserved keyword
 		if keyword, ok := reservedKeywords[strings.ToUpper(tok.Value)]; ok {
 			tok.Type = keyword
+			tok.Value = strings.ToUpper(tok.Value)
+		}
+
+		// The string might be a function name
+		if _, ok := functionNames[strings.ToUpper(tok.Value)]; ok {
+			tok.Type = FUNC
 			tok.Value = strings.ToUpper(tok.Value)
 		}
 	}

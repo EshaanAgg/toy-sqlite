@@ -88,8 +88,14 @@ func TestLexer(t *testing.T) {
 		},
 
 		{
-			desc:  "SELECT statement with WHERE clause, all ARITHMETIC operators, PARENTHESIS and FLOATS",
-			input: "SELECT * FROM table_name WHERE (column = 10 AND column2 != 20) OR (column3 > 30.0 AND column4 >= 40.124) OR (column5 < 50.10 AND column6 <= 60)",
+			desc: "SELECT statement with WHERE clause, all ARITHMETIC operators, PARENTHESIS and FLOATS",
+			input: `
+				SELECT * FROM table_name 
+				WHERE 
+					(column = 10 AND column2 != 20) 
+					OR (column3 > 30.0 AND column4 >= 40.124) 
+					OR (column5 < 50.10 AND column6 <= 60)
+				`,
 			want: []sql.Token{
 				{Type: sql.SELECT, Value: "SELECT"},
 				{Type: sql.ASTERISK, Value: "*"},
@@ -213,6 +219,88 @@ func TestLexer(t *testing.T) {
 				{Type: sql.OBJ, Value: "column1"},
 				{Type: sql.INTEGER, Value: "INTEGER"},
 				{Type: sql.CLOSE_PAREN, Value: ")"},
+				{Type: sql.EOF, Value: ""},
+			},
+		},
+
+		{
+			desc:  "Logical Operators",
+			input: "AND OR NOT",
+			want: []sql.Token{
+				{Type: sql.AND, Value: "AND"},
+				{Type: sql.OR, Value: "OR"},
+				{Type: sql.NOT, Value: "NOT"},
+				{Type: sql.EOF, Value: ""},
+			},
+		},
+
+		{
+			desc:  "Arithmetic Operators",
+			input: "+ - / % *",
+			want: []sql.Token{
+				{Type: sql.ADD, Value: "+"},
+				{Type: sql.SUB, Value: "-"},
+				{Type: sql.DIV, Value: "/"},
+				{Type: sql.MOD, Value: "%"},
+				{Type: sql.ASTERISK, Value: "*"},
+				{Type: sql.EOF, Value: ""},
+			},
+		},
+
+		{
+			desc:  "Arithmetic Operators without space",
+			input: "+-/*%",
+			want: []sql.Token{
+				{Type: sql.ADD, Value: "+"},
+				{Type: sql.SUB, Value: "-"},
+				{Type: sql.DIV, Value: "/"},
+				{Type: sql.ASTERISK, Value: "*"},
+				{Type: sql.MOD, Value: "%"},
+				{Type: sql.EOF, Value: ""},
+			},
+		},
+
+		{
+			desc:  "Sample Expression",
+			input: "(1+2)*(3-4)/5%6 AND UPPER(COLUMN1=10 OR COLUMN2=20)",
+			want: []sql.Token{
+				{Type: sql.OPEN_PAREN, Value: "("},
+				{Type: sql.INT, Value: "1"},
+				{Type: sql.ADD, Value: "+"},
+				{Type: sql.INT, Value: "2"},
+				{Type: sql.CLOSE_PAREN, Value: ")"},
+				{Type: sql.ASTERISK, Value: "*"},
+				{Type: sql.OPEN_PAREN, Value: "("},
+				{Type: sql.INT, Value: "3"},
+				{Type: sql.SUB, Value: "-"},
+				{Type: sql.INT, Value: "4"},
+				{Type: sql.CLOSE_PAREN, Value: ")"},
+				{Type: sql.DIV, Value: "/"},
+				{Type: sql.INT, Value: "5"},
+				{Type: sql.MOD, Value: "%"},
+				{Type: sql.INT, Value: "6"},
+				{Type: sql.AND, Value: "AND"},
+				{Type: sql.FUNC, Value: "UPPER"},
+				{Type: sql.OPEN_PAREN, Value: "("},
+				{Type: sql.OBJ, Value: "COLUMN1"},
+				{Type: sql.EQ, Value: "="},
+				{Type: sql.INT, Value: "10"},
+				{Type: sql.OR, Value: "OR"},
+				{Type: sql.OBJ, Value: "COLUMN2"},
+				{Type: sql.EQ, Value: "="},
+				{Type: sql.INT, Value: "20"},
+				{Type: sql.CLOSE_PAREN, Value: ")"},
+				{Type: sql.EOF, Value: ""},
+			},
+		},
+
+		{
+			desc:  "Function names",
+			input: "UPPER LOWER CONCAT",
+			want: []sql.Token{
+				{Type: sql.FUNC, Value: "UPPER"},
+				{Type: sql.FUNC, Value: "LOWER"},
+				{Type: sql.FUNC, Value: "CONCAT"},
 				{Type: sql.EOF, Value: ""},
 			},
 		},
