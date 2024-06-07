@@ -15,7 +15,7 @@ func (e *Expr) evalCall() error {
 
 	// Call the appropriate function based on the function name
 	var resExpr Expr
-	switch e.functionName {
+	switch e.operator {
 	case "UPPER":
 		resExpr, err = upperExprFunc(e.operands)
 	case "LOWER":
@@ -23,11 +23,11 @@ func (e *Expr) evalCall() error {
 	case "CONCAT":
 		resExpr, err = concatExprFunc(e.operands)
 	default:
-		return fmt.Errorf("unknown function name: %s", e.functionName)
+		return fmt.Errorf("unknown function name: %s", e.operator)
 	}
 
 	if err != nil {
-		return fmt.Errorf("failed to evaluate function %s: %v", e.functionName, err)
+		return fmt.Errorf("failed to evaluate function %s: %v", e.operator, err)
 	}
 
 	// Update the expression with the result

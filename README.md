@@ -7,6 +7,8 @@ This is a toy SQLite implementation that supports basic SQL queries like `SELECT
 
 The implementation relies on a fully self written SQL parser and query executor. It is a decent parser which can't handle subqueries or joins, but can parse and understand many queries which are beyond the scope of the challenge.
 
+## Features
+
 The current implementation supports:
 - Parsing and reading the metadata section of a SQLite database file
 - Dot commands like `.tables` and `.dbinfo`
@@ -21,6 +23,24 @@ SELECT COUNT(a, b, c) FROM table_name;
 SELECT * FROM table_name;
 SELECT a, b, c FROM table_name;
 ```
+### Notes on the `WHERE` clause
+
+In the `WHERE` clause make use of the following precedence to resolve ambiguity:
+1. Parentheses 
+2. NOT
+3. AND
+4. OR
+5. Comparison Operators (>, <, =, !=, >=, <=)
+6. +, - 
+7. Function Calls
+8. *, /
+
+The following string functions are supported in the `WHERE` clause:
+1. `CONCAT`
+2. `LOWER`
+3. `UPPER`
+
+This is definitely not a full spec for the `WHERE` clause, but it indents to handle all the non-trivial cases, and has a decently complicated grammar which can be easily expanded from here.
 
 # Sample Database
 

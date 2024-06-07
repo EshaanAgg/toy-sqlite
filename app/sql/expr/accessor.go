@@ -15,7 +15,7 @@ func (e *Expr) StringVal() string {
 }
 
 func (e *Expr) IntVal() int {
-	if e.ValueType != "INT" {
+	if e.ValueType != "INTEGER" {
 		panic(fmt.Sprintf("Trying to get int value of a non-int type: %s for Expr %v", e.ValueType, e))
 	}
 	intVal, err := strconv.Atoi(e.value)

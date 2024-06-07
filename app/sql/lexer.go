@@ -41,7 +41,6 @@ const (
 	ADD
 	SUB
 	DIV
-	MOD
 	// No MUL as it is represented by ASTERISK
 
 	FUNC
@@ -206,11 +205,6 @@ func (l *Lexer) NextToken() (Token, error) {
 		l.Next()
 		tok.Type = DIV
 		tok.Value = "/"
-
-	case '%':
-		l.Next()
-		tok.Type = MOD
-		tok.Value = "%"
 
 	case '*':
 		l.Next()

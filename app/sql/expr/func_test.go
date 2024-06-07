@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type testCallEval struct {
+type testEval struct {
 	name       string
 	shouldErr  bool
 	inputExpr  Expr
@@ -14,7 +14,7 @@ type testCallEval struct {
 }
 
 func TestCallEval(t *testing.T) {
-	testCases := []testCallEval{
+	testCases := []testEval{
 		{
 			name: "UPPER - Valid Call",
 			inputExpr: getCallExpr(
@@ -150,7 +150,7 @@ func TestCallEval(t *testing.T) {
 			assert.Equal(t, tc.outputExpr.value, tc.inputExpr.value)
 			assert.Equal(t, tc.outputExpr.ValueType, tc.inputExpr.ValueType)
 			assert.Equal(t, 0, len(tc.inputExpr.operands))
-			assert.Equal(t, "", tc.inputExpr.functionName)
+			assert.Equal(t, "", tc.inputExpr.operator)
 		})
 	}
 }

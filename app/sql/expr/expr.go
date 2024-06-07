@@ -5,10 +5,10 @@ import (
 )
 
 type Expr struct {
-	value        string
-	ValueType    string // "STRING", "INT", "BOOL", "FLOAT", "BINARY", "CALL"
-	functionName string // only used when ValueType is "CALL"
-	operands     []Expr
+	value     string
+	ValueType string // "STRING", "INTEGER", "BOOL", "FLOAT", "BINARY", "CALL"
+	operator  string // only used when ValueType is "CALL" or "BINARY"
+	operands  []Expr
 }
 
 // Debug print for Expr

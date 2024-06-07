@@ -236,12 +236,11 @@ func TestLexer(t *testing.T) {
 
 		{
 			desc:  "Arithmetic Operators",
-			input: "+ - / % *",
+			input: "+ - / *",
 			want: []sql.Token{
 				{Type: sql.ADD, Value: "+"},
 				{Type: sql.SUB, Value: "-"},
 				{Type: sql.DIV, Value: "/"},
-				{Type: sql.MOD, Value: "%"},
 				{Type: sql.ASTERISK, Value: "*"},
 				{Type: sql.EOF, Value: ""},
 			},
@@ -249,20 +248,19 @@ func TestLexer(t *testing.T) {
 
 		{
 			desc:  "Arithmetic Operators without space",
-			input: "+-/*%",
+			input: "+-/*",
 			want: []sql.Token{
 				{Type: sql.ADD, Value: "+"},
 				{Type: sql.SUB, Value: "-"},
 				{Type: sql.DIV, Value: "/"},
 				{Type: sql.ASTERISK, Value: "*"},
-				{Type: sql.MOD, Value: "%"},
 				{Type: sql.EOF, Value: ""},
 			},
 		},
 
 		{
 			desc:  "Sample Expression",
-			input: "(1+2)*(3-4)/5%6 AND UPPER(COLUMN1=10 OR COLUMN2=20)",
+			input: "(1+2)*(3-4)/5+6 AND UPPER(COLUMN1=10 OR COLUMN2=20)",
 			want: []sql.Token{
 				{Type: sql.OPEN_PAREN, Value: "("},
 				{Type: sql.INT, Value: "1"},
@@ -277,7 +275,7 @@ func TestLexer(t *testing.T) {
 				{Type: sql.CLOSE_PAREN, Value: ")"},
 				{Type: sql.DIV, Value: "/"},
 				{Type: sql.INT, Value: "5"},
-				{Type: sql.MOD, Value: "%"},
+				{Type: sql.ADD, Value: "+"},
 				{Type: sql.INT, Value: "6"},
 				{Type: sql.AND, Value: "AND"},
 				{Type: sql.FUNC, Value: "UPPER"},
