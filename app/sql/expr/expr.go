@@ -6,8 +6,8 @@ import (
 
 type Expr struct {
 	value     string
-	ValueType string // "STRING", "INTEGER", "BOOL", "FLOAT", "BINARY", "CALL"
-	operator  string // only used when ValueType is "CALL" or "BINARY"
+	ValueType string // STRING, INTEGER, BOOL, FLOAT, CALL, UNARY, BINARY
+	operator  string // Only used when ValueType is not a basic type (STRING, INTEGER, BOOL, FLOAT)
 	operands  []Expr
 }
 

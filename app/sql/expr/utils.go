@@ -60,6 +60,14 @@ func getBoolExpr(value bool) Expr {
 	}
 }
 
+func getUnaryExpr(operator string, operand Expr) Expr {
+	return Expr{
+		ValueType: "UNARY",
+		operator:  operator,
+		operands:  []Expr{operand},
+	}
+}
+
 func getCallExpr(operator string, operands ...Expr) Expr {
 	return Expr{
 		ValueType: "CALL",
